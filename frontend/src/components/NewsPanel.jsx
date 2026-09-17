@@ -1,0 +1,1 @@
+const k=[["Active Incidents","24"],["Critical","5"],["Affected People","1,240"],["Available Resources","18"]];export default function KPICards(){return <div className="kpis">{k.map(x=><div className="card" key={x[0]}><small>{x[0]}</small><div className="kpi">{x[1]}</div></div>)}</div>}

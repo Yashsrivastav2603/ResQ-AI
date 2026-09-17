@@ -1,0 +1,1 @@
+export default function ResourceCard({item,onDeploy}){const available=item[2]==="Available";return <div className="card"><div className="icon">{item[1]==="Ambulance"?"🚑":item[1]==="Rescue Team"?"🛟":"🏥"}</div><h3>{item[0]}</h3><p>{item[1]}</p><small>{item[2]}</small>{available&&<button className="btn primary" onClick={onDeploy}>Deploy</button>}</div>}

@@ -1,0 +1,2 @@
+Know: React, REST, JSON, FastAPI, PostgreSQL, SQL/CRUD, SQLAlchemy/ORM, CORS, authentication vs authorization, validation, database relationships.
+Core answer: AI extracts incident intelligence. A deterministic decision-support layer combines severity, affected population, resource matching, availability and distance to generate a recommendation. The authorized responder makes the final deployment decision.

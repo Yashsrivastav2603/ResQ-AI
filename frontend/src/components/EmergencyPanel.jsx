@@ -1,0 +1,1 @@
+export default function ImageUploader({value,onChange}){return <div><label>📷 Disaster Image</label><input type="file" accept="image/*" onChange={e=>onChange(e.target.files?.[0]||null)}/>{value&&<small>{value.name}</small>}</div>}

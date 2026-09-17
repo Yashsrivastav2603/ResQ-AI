@@ -1,0 +1,3 @@
+// AI calls should go through FastAPI. Never expose secret AI keys in React.
+// This fallback is only for development/demo safety.
+export function fallbackAnalysis(text=""){const t=text.toLowerCase();if(t.includes("fire"))return{incident:"Fire",severity:"High",affected_people:10,needs:["Rescue","Medical"]};if(t.includes("earthquake"))return{incident:"Earthquake",severity:"Critical",affected_people:50,needs:["Rescue","Medical"]};return{incident:"Flood",severity:"Medium",affected_people:20,needs:["Rescue"]};}

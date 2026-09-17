@@ -1,0 +1,1 @@
+export default function DisasterMap(){return <div className="card map"><h2>Live Priority Map</h2><div className="mapbox"><span style={{top:"25%",left:"60%"}}>🔴</span><span style={{top:"48%",left:"35%"}}>🟠</span><span style={{top:"68%",left:"70%"}}>🟡</span><small>Leaflet integration: Day 22</small></div></div>}

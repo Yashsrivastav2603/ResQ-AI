@@ -1,0 +1,1 @@
+export default function Incidents(){return <section><div className="heading"><span className="eyebrow">INCIDENT MANAGEMENT</span><h1>Incidents</h1></div><IncidentList/></section>}
