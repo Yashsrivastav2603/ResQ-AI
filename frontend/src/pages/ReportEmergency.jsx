@@ -315,7 +315,7 @@ function ReportEmergency() {
 
               {!imagePreview ? (
 
-                <label className="flex min-h-[220px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-400/30 bg-cyan-400/[0.03] transition hover:border-cyan-400/60 hover:bg-cyan-400/[0.06]">
+                <label className="flex min-h-55 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-400/30 bg-cyan-400/3 transition hover:border-cyan-400/60 hover:bg-cyan-400/6">
 
                   <div className="text-5xl">
                     📷
@@ -345,7 +345,7 @@ function ReportEmergency() {
                   <img
                     src={imagePreview}
                     alt="Emergency preview"
-                    className="max-h-[420px] w-full object-cover"
+                    className="max-h-105 w-full object-cover"
                   />
 
                   <label className="absolute bottom-4 right-4 cursor-pointer rounded-xl bg-black/70 px-4 py-2 text-sm font-semibold backdrop-blur-md transition hover:bg-black">
@@ -632,7 +632,7 @@ function ReportEmergency() {
 
             {/* SAFETY */}
 
-            <div className="rounded-3xl border border-yellow-400/10 bg-yellow-400/[0.03] p-6">
+            <div className="rounded-3xl border border-yellow-400/10 bg-yellow-400/3 p-6">
 
               <div className="text-2xl">
                 ⚠️
@@ -655,7 +655,7 @@ function ReportEmergency() {
 
             {analysis && (
 
-              <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/[0.04] p-6">
+              <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/4 p-6">
 
                 <div className="flex items-center justify-between">
 

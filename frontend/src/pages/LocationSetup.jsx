@@ -160,7 +160,7 @@ function LocationSetup() {
           </div>
 
           {/* Privacy */}
-          <div className="mt-5 flex gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+          <div className="mt-5 flex gap-3 rounded-2xl border border-white/10 bg-white/2 p-4">
 
             <span className="text-lg">🔐</span>
 

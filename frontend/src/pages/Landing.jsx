@@ -83,17 +83,17 @@ function Landing() {
             {/* STATS */}
             <div className="mt-12 grid max-w-xl grid-cols-3 gap-4">
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
                 <p className="text-2xl font-black text-cyan-400">24/7</p>
                 <p className="mt-1 text-sm text-slate-500">Monitoring</p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
                 <p className="text-2xl font-black text-purple-400">AI</p>
                 <p className="mt-1 text-sm text-slate-500">Analysis</p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
                 <p className="text-2xl font-black text-red-400">LIVE</p>
                 <p className="mt-1 text-sm text-slate-500">Alerts</p>
               </div>
@@ -105,7 +105,7 @@ function Landing() {
           {/* RADAR */}
           <div className="flex justify-center">
 
-            <div className="relative flex h-[420px] w-[420px] items-center justify-center">
+            <div className="relative flex h-105 w-105 items-center justify-center">
 
               <div className="absolute h-full w-full rounded-full border border-cyan-400/10" />
               <div className="absolute h-[75%] w-[75%] rounded-full border border-cyan-400/10" />
