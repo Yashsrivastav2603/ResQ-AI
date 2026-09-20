@@ -25,9 +25,8 @@ const handleSubmit = (e) => {
     alert("Password must be 8+ characters with an uppercase letter, a lowercase letter, and a digit.");
     return;
   }
-
-  mergeSignupDraft({ name: form.name, email: form.email, password: form.password });
-  navigate("/verification");
+mergeSignupDraft({ name: form.name, email: form.email, password: form.password });
+navigate("/basic-details");   // ← was "/verification", now correct
 };
 
   return (
