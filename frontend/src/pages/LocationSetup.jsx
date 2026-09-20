@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../services/coreApi";
+import { getSignupDraft, clearSignupDraft } from "../services/signupDraft";
 
 function LocationSetup() {
   const navigate = useNavigate();
 
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -33,8 +36,41 @@ function LocationSetup() {
     );
   };
 
-  const continueToHome = () => {
-    navigate("/home");
+  const continueToHome = async () => {
+    if (!location) {
+      alert(
+        "Please allow location access before continuing — ResQ-AI needs it to show disaster alerts near you."
+      );
+      return;
+    }
+
+    const draft = getSignupDraft();
+    if (!draft.email || !draft.password) {
+      alert("Your session expired. Please sign up again.");
+      navigate("/signup");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await auth.register({
+        name: draft.name,
+        email: draft.email,
+        password: draft.password,
+        phone: draft.phone,
+        location: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          radiusKm: 300,
+        },
+      });
+      clearSignupDraft();
+      navigate("/home");
+    } catch (err) {
+      alert(err.message || "Could not create your account. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -175,9 +211,10 @@ function LocationSetup() {
           {/* Continue */}
           <button
             onClick={continueToHome}
-            className="mt-7 w-full rounded-xl bg-cyan-400 py-4 font-black text-black transition hover:bg-cyan-300"
+            disabled={submitting}
+            className="mt-7 w-full rounded-xl bg-cyan-400 py-4 font-black text-black transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Continue to ResQ-AI →
+            {submitting ? "Creating your account..." : "Continue to ResQ-AI →"}
           </button>
 
         </div>
