@@ -61,6 +61,10 @@ function LocationSetup() {
         location: {
           latitude: location.latitude,
           longitude: location.longitude,
+          city: draft.city,
+          state: draft.state,
+          postalCode: draft.postalCode,
+          country: draft.country || "India",
           radiusKm: 300,
         },
       });
