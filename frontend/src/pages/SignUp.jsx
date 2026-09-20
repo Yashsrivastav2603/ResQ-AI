@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { mergeSignupDraft } from "../services/signupDraft";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -11,16 +12,23 @@ function SignUp() {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
+  if (form.password !== form.confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
 
-    navigate("/signin");
-  };
+  const strongEnough = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}$/.test(form.password);
+  if (!strongEnough) {
+    alert("Password must be 8+ characters with an uppercase letter, a lowercase letter, and a digit.");
+    return;
+  }
+
+  mergeSignupDraft({ name: form.name, email: form.email, password: form.password });
+  navigate("/verification");
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#050b14] px-6 py-10 text-white">
