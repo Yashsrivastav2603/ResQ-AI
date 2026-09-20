@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
-
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -12,141 +11,129 @@ function SignUp() {
     confirmPassword: "",
   });
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match");
+      alert("Passwords do not match.");
       return;
     }
 
-    // Temporary frontend flow
     navigate("/signin");
   };
 
   return (
-    <div className="auth-page">
+    <div className="flex min-h-screen items-center justify-center bg-[#050b14] px-6 py-10 text-white">
 
-      <div className="auth-glow"></div>
+      <div className="w-full max-w-md">
 
-      <div className="auth-card">
-
-        <Link to="/" className="auth-logo">
-          ✦ ResQ<span>-AI</span>
+        <Link to="/" className="mb-8 block text-center text-2xl font-black">
+          ResQ<span className="text-cyan-400">-AI</span>
         </Link>
 
-        <div className="auth-heading">
+        <div className="rounded-3xl border border-white/10 bg-[#081421] p-8 shadow-2xl">
 
-          <span>WELCOME TO RESQ-AI</span>
+          <div className="mb-8">
+            <p className="text-xs font-bold tracking-widest text-cyan-400">
+              CREATE ACCOUNT
+            </p>
 
-          <h1>Create your account</h1>
+            <h1 className="mt-2 text-3xl font-black">
+              Join ResQ-AI
+            </h1>
 
-          <p>
-            Join the disaster intelligence network.
+            <p className="mt-2 text-sm text-slate-500">
+              Create your disaster-response profile.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">
+                Full Name
+              </label>
+
+              <input
+                required
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+                className="w-full rounded-xl border border-white/10 bg-[#050b14] px-4 py-3 outline-none focus:border-cyan-400"
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">
+                Email
+              </label>
+
+              <input
+                required
+                type="email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value })
+                }
+                className="w-full rounded-xl border border-white/10 bg-[#050b14] px-4 py-3 outline-none focus:border-cyan-400"
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">
+                Password
+              </label>
+
+              <input
+                required
+                type="password"
+                value={form.password}
+                onChange={(e) =>
+                  setForm({ ...form, password: e.target.value })
+                }
+                className="w-full rounded-xl border border-white/10 bg-[#050b14] px-4 py-3 outline-none focus:border-cyan-400"
+                placeholder="Create password"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">
+                Confirm Password
+              </label>
+
+              <input
+                required
+                type="password"
+                value={form.confirmPassword}
+                onChange={(e) =>
+                  setForm({ ...form, confirmPassword: e.target.value })
+                }
+                className="w-full rounded-xl border border-white/10 bg-[#050b14] px-4 py-3 outline-none focus:border-cyan-400"
+                placeholder="Confirm password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-cyan-400 py-3.5 font-black text-black transition hover:bg-cyan-300"
+            >
+              Create Account →
+            </button>
+
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Already have an account?{" "}
+            <Link to="/signin" className="text-cyan-400 hover:underline">
+              Sign in
+            </Link>
           </p>
 
         </div>
-
-        <form onSubmit={handleSubmit}>
-
-          <div className="input-group">
-
-            <label>Full Name</label>
-
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              required
-            />
-
-          </div>
-
-          <div className="input-group">
-
-            <label>Email</label>
-
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-            />
-
-          </div>
-
-          <div className="input-group">
-
-            <label>Password</label>
-
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              required
-            />
-
-          </div>
-
-          <div className="input-group">
-
-            <label>Confirm Password</label>
-
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              required
-            />
-
-          </div>
-
-          <label className="terms-check">
-
-            <input type="checkbox" required />
-
-            <span>
-              I agree to the terms and privacy policy
-            </span>
-
-          </label>
-
-          <button
-            type="submit"
-            className="auth-button"
-          >
-            Create Account →
-          </button>
-
-        </form>
-
-        <div className="auth-footer">
-
-          Already have an account?
-
-          <Link to="/signin">
-            Sign In
-          </Link>
-
-        </div>
-
       </div>
-
     </div>
   );
 }

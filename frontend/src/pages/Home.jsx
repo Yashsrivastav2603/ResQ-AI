@@ -1,262 +1,428 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import DisasterMap from "../components/DisasterMap";
 
 function Home() {
-  const navigate = useNavigate();
-
   return (
-    <div className="home-page">
+    <div className="min-h-screen bg-[#050b14] text-white">
 
       {/* NAVBAR */}
-      <nav className="home-navbar">
+      <nav className="border-b border-white/10 bg-[#07101d]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
 
-        <div className="home-logo">
-          <span>◉</span>
-          ResQ-AI
-        </div>
+          <Link to="/home" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-xl ring-1 ring-cyan-400/30">
+              🛡️
+            </div>
 
-        
+            <div>
+              <h1 className="text-xl font-bold tracking-wide">
+                ResQ<span className="text-cyan-400">-AI</span>
+              </h1>
+              <p className="text-[10px] tracking-[0.25em] text-slate-500">
+                DISASTER INTELLIGENCE
+              </p>
+            </div>
+          </Link>
 
-        <div className="home-nav-links">
-          <span className="active">Home</span>
+          <div className="hidden items-center gap-8 md:flex">
+            <Link
+              to="/home"
+              className="text-sm text-cyan-400 transition hover:text-cyan-300"
+            >
+              Home
+            </Link>
 
-          <span
-            onClick={() => navigate("/report")}
-          >
-            Emergencies
-          </span>
+            <Link
+              to="/report"
+              className="text-sm text-slate-300 transition hover:text-white"
+            >
+              Emergency
+            </Link>
 
-          <span>Alerts</span>
-          <span>Resources</span>
-        </div>
+            <a
+              href="#news"
+              className="text-sm text-slate-300 transition hover:text-white"
+            >
+              News
+            </a>
 
-        <div className="home-user">
-          <span className="notification">🔔</span>
-          <div className="user-avatar">
-            U
+            <a
+              href="#assistant"
+              className="text-sm text-slate-300 transition hover:text-white"
+            >
+              AI Assistant
+            </a>
           </div>
-        </div>
 
+          <div className="flex items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="text-xs text-slate-400">SYSTEM STATUS</p>
+              <p className="text-xs font-semibold text-emerald-400">
+                ● OPERATIONAL
+              </p>
+            </div>
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">
+              👤
+            </div>
+          </div>
+
+        </div>
       </nav>
 
 
       {/* HERO */}
-      <section className="home-hero">
+      <main className="mx-auto max-w-7xl px-6 py-10">
 
-        <div>
+        <section className="relative overflow-hidden rounded-3xl border border-cyan-400/10 bg-linear-to-br from-[#0b1b2d] via-[#081421] to-[#050b14] p-8 md:p-12">
 
-          <div className="safe-pill">
-            <span></span>
-            AREA STATUS: MONITORING
+          {/* Background glow */}
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-blue-600/10 blur-3xl" />
+
+          <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
+
+            {/* LEFT */}
+            <div>
+
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/5 px-4 py-2 text-xs font-medium tracking-widest text-cyan-300">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" />
+                AI DISASTER RESPONSE NETWORK
+              </div>
+
+              <h2 className="max-w-2xl text-5xl font-black leading-tight tracking-tight md:text-6xl">
+                Know the danger.
+                <br />
+                <span className="text-cyan-400">
+                  Respond faster.
+                </span>
+              </h2>
+
+              <p className="mt-6 max-w-xl text-base leading-7 text-slate-400 md:text-lg">
+                ResQ-AI combines disaster intelligence, location data and
+                AI-powered incident analysis to help communities and
+                authorities respond faster.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-4">
+
+                <Link
+                  to="/report"
+                  className="group rounded-xl bg-red-500 px-6 py-4 font-bold shadow-lg shadow-red-500/20 transition hover:-translate-y-1 hover:bg-red-400"
+                >
+                  🚨 REPORT EMERGENCY
+                  <span className="ml-2 transition group-hover:translate-x-1">
+                    →
+                  </span>
+                </Link>
+
+                <a
+                  href="#map"
+                  className="rounded-xl border border-white/10 bg-white/5 px-6 py-4 font-semibold text-slate-200 transition hover:bg-white/10"
+                >
+                  View Live Map
+                </a>
+
+              </div>
+
+              {/* Stats */}
+              <div className="mt-10 grid max-w-lg grid-cols-3 gap-4">
+
+                <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
+                  <p className="text-2xl font-bold text-cyan-400">24/7</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Monitoring
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
+                  <p className="text-2xl font-bold text-purple-400">AI</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Analysis
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
+                  <p className="text-2xl font-bold text-red-400">LIVE</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Alerts
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+
+            {/* RADAR */}
+            <div className="flex justify-center">
+
+              <div className="relative flex h-80 w-[320px] items-center justify-center">
+
+                <div className="absolute h-full w-full animate-pulse rounded-full border border-cyan-400/10" />
+                <div className="absolute h-[75%] w-[75%] rounded-full border border-cyan-400/15" />
+                <div className="absolute h-[50%] w-[50%] rounded-full border border-cyan-400/20" />
+
+                <div className="absolute h-px w-full bg-cyan-400/10" />
+                <div className="absolute h-full w-px bg-cyan-400/10" />
+
+                <div className="z-10 flex h-28 w-28 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-400/5 text-6xl shadow-2xl shadow-cyan-500/20">
+                  🇮🇳
+                </div>
+
+                {/* Points */}
+                <div className="absolute left-[18%] top-[27%] h-4 w-4 animate-ping rounded-full bg-red-500" />
+                <div className="absolute left-[18%] top-[27%] h-3 w-3 rounded-full bg-red-500" />
+
+                <div className="absolute right-[20%] top-[35%] h-4 w-4 animate-ping rounded-full bg-yellow-400" />
+                <div className="absolute right-[20%] top-[35%] h-3 w-3 rounded-full bg-yellow-400" />
+
+                <div className="absolute bottom-[22%] left-[35%] h-4 w-4 animate-ping rounded-full bg-emerald-400" />
+                <div className="absolute bottom-[22%] left-[35%] h-3 w-3 rounded-full bg-emerald-400" />
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        {/* RISK + MAP */}
+        <section
+          id="map"
+          className="mt-8 grid gap-6 lg:grid-cols-3"
+        >
+
+          {/* RISK CARD */}
+          <div className="rounded-3xl border border-yellow-400/10 bg-[#081421] p-6">
+
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-300">
+                AREA RISK
+              </p>
+
+              <span className="rounded-full bg-yellow-400/10 px-3 py-1 text-xs text-yellow-300">
+                LIVE
+              </span>
+            </div>
+
+            <div className="mt-8">
+              <div className="flex items-center gap-4">
+
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-yellow-400/10 text-3xl">
+                  🟡
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold">
+                    Moderate
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    Current area risk
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="mt-7 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full w-[58%] rounded-full bg-yellow-400" />
+              </div>
+
+              <p className="mt-4 text-sm leading-6 text-slate-400">
+                Risk information will be calculated using historical
+                and live disaster data.
+              </p>
+            </div>
+
           </div>
 
-          <h1>
-            Disaster intelligence,
-            <br />
-            <span>when every second matters.</span>
-          </h1>
 
-          <p>
-            Real-time disaster information, emergency reporting
-            and intelligent response assistance — all in one place.
-          </p>
+          {/* MAP PLACEHOLDER */}
+          <div className="relative overflow-hidden rounded-3xl border border-cyan-400/10 bg-[#081421] p-6 lg:col-span-2">
 
-          <button
-            className="emergency-button"
-            onClick={() => navigate("/report")}
+            <div className="flex items-center justify-between">
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  LIVE INTELLIGENCE
+                </p>
+
+                <h3 className="mt-1 text-2xl font-bold">
+                  India Disaster Map
+                </h3>
+              </div>
+
+              <div className="flex gap-3 text-xs">
+                <span className="text-red-400">● Critical</span>
+                <span className="text-yellow-400">● High</span>
+                <span className="text-emerald-400">● Safe</span>
+              </div>
+
+              
+
+            </div>
+
+            <div className="mt-6 h-105">
+  <DisasterMap />
+</div>
+
+          </div>
+
+        </section>
+
+
+        {/* NEWS + CHAT */}
+        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+
+          {/* NEWS */}
+          <div
+            id="news"
+            className="rounded-3xl border border-white/10 bg-[#081421] p-6"
           >
-            🚨 Report Emergency
-          </button>
 
-        </div>
+            <div className="flex items-center justify-between">
 
-        <div className="hero-stat-card">
+              <div>
+                <p className="text-sm text-slate-500">
+                  INFORMATION
+                </p>
 
-          <div className="stat-label">
-            YOUR AREA
-          </div>
+                <h3 className="mt-1 text-2xl font-bold">
+                  Latest Disaster News
+                </h3>
+              </div>
 
-          <div className="stat-location">
-            📍 Your Location
-          </div>
+              <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs text-cyan-300">
+                LIVE FEED
+              </span>
 
-          <div className="risk-level">
-            <span></span>
-            Low Risk
-          </div>
-
-          <p>
-            No critical emergency detected nearby.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      {/* MAIN GRID */}
-      <section className="dashboard-grid">
-
-        {/* MAP */}
-        <div className="dashboard-card map-card">
-
-          <div className="card-header">
-
-            <div>
-              <small>LIVE INTELLIGENCE</small>
-              <h2>India Disaster Map</h2>
             </div>
 
-            <div className="map-status">
-              ● LIVE
+            <div className="mt-6 space-y-3">
+
+              {[
+                "Heavy rainfall warning issued for multiple regions.",
+                "Authorities monitoring flood-prone areas.",
+                "Emergency response teams remain on standby.",
+              ].map((news, index) => (
+
+                <div
+                  key={index}
+                  className="rounded-2xl border border-white/5 bg-white/3 p-4 transition hover:bg-white/6"
+                >
+                  <div className="flex gap-3">
+
+                    <div className="mt-1 h-2 w-2 rounded-full bg-cyan-400" />
+
+                    <div>
+                      <p className="text-sm leading-6 text-slate-300">
+                        {news}
+                      </p>
+
+                      <p className="mt-1 text-xs text-slate-600">
+                        Recently updated
+                      </p>
+                    </div>
+
+                  </div>
+                </div>
+
+              ))}
+
             </div>
 
           </div>
 
-          <div className="fake-india-map">
 
-            <div className="india-shape">
-              INDIA
+          {/* CHAT */}
+          <div
+            id="assistant"
+            className="rounded-3xl border border-purple-400/10 bg-[#081421] p-6"
+          >
+
+            <div className="flex items-center gap-3">
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-400/10 text-2xl">
+                🤖
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  RESQ-AI ASSISTANT
+                </p>
+
+                <h3 className="text-2xl font-bold">
+                  Disaster Assistant
+                </h3>
+              </div>
+
             </div>
 
-            <div className="map-point red p1"></div>
-            <div className="map-point red p2"></div>
+            <div className="mt-6 rounded-2xl border border-white/5 bg-white/3 p-5">
 
-            <div className="map-point yellow p3"></div>
-
-            <div className="map-point green p4"></div>
-            <div className="map-point green p5"></div>
-
-          </div>
-
-          <div className="map-legend">
-
-            <span>
-              <i className="legend-red"></i>
-              Critical
-            </span>
-
-            <span>
-              <i className="legend-yellow"></i>
-              Moderate
-            </span>
-
-            <span>
-              <i className="legend-green"></i>
-              Safe
-            </span>
-
-          </div>
-
-        </div>
-
-
-        {/* NEWS */}
-        <div className="dashboard-card news-card">
-
-          <div className="card-header">
-
-            <div>
-              <small>STAY INFORMED</small>
-              <h2>Disaster News</h2>
-            </div>
-
-            <span className="news-live">
-              LIVE
-            </span>
-
-          </div>
-
-          <div className="news-item">
-            <div className="news-icon">🌧️</div>
-
-            <div>
-              <h3>Heavy rainfall alert</h3>
-              <p>
-                Authorities monitoring rainfall conditions.
+              <p className="text-sm leading-6 text-slate-400">
+                Ask about disaster preparedness, emergency procedures,
+                evacuation planning or what to do during a disaster.
               </p>
-              <small>12 min ago</small>
+
             </div>
-          </div>
 
-          <div className="news-item">
-            <div className="news-icon">🌊</div>
+            <div className="mt-4 flex gap-3">
 
-            <div>
-              <h3>Flood preparedness advisory</h3>
-              <p>
-                Residents in vulnerable areas advised to stay alert.
-              </p>
-              <small>35 min ago</small>
+              <input
+                type="text"
+                placeholder="Ask ResQ-AI..."
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-purple-400/50"
+              />
+
+              <button className="rounded-xl bg-purple-500 px-5 font-bold transition hover:bg-purple-400">
+                →
+              </button>
+
             </div>
+
           </div>
 
-          <div className="news-item">
-            <div className="news-icon">🌍</div>
+        </section>
 
-            <div>
-              <h3>Regional seismic activity</h3>
-              <p>
-                Monitoring stations continue observation.
-              </p>
-              <small>1 hr ago</small>
+
+        {/* EMERGENCY BANNER */}
+        <section className="mt-8 overflow-hidden rounded-3xl border border-red-500/20 bg-linear-to-r from-red-500/10 to-orange-500/5 p-6">
+
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+            <div className="flex items-center gap-4">
+
+              <div className="flex h-14 w-14 animate-pulse items-center justify-center rounded-2xl bg-red-500/10 text-2xl">
+                🚨
+              </div>
+
+              <div>
+                <h3 className="font-bold">
+                  Facing an emergency?
+                </h3>
+
+                <p className="text-sm text-slate-500">
+                  Report your situation and help emergency responders
+                  understand what is happening.
+                </p>
+              </div>
+
             </div>
+
+            <Link
+              to="/report"
+              className="rounded-xl bg-red-500 px-6 py-3 text-center font-bold transition hover:bg-red-400"
+            >
+              Report Emergency →
+            </Link>
+
           </div>
 
-        </div>
+        </section>
 
-      </section>
-
-
-      {/* CHAT */}
-      <section className="dashboard-card chat-card">
-
-        <div className="chat-heading">
-
-          <div className="ai-avatar">
-            ✦
-          </div>
-
-          <div>
-            <small>AI DISASTER ASSISTANT</small>
-            <h2>How can I help you?</h2>
-          </div>
-
-          <div className="online-status">
-            ● ONLINE
-          </div>
-
-        </div>
-
-        <div className="suggestion-row">
-
-          <button>
-            What should I do during a flood?
-          </button>
-
-          <button>
-            How do I prepare an emergency kit?
-          </button>
-
-          <button>
-            What does this alert mean?
-          </button>
-
-        </div>
-
-        <div className="chat-input">
-
-          <input
-            placeholder="Ask ResQ-AI anything about disaster management..."
-          />
-
-          <button>
-            ➤
-          </button>
-
-        </div>
-
-      </section>
+      </main>
 
     </div>
   );
