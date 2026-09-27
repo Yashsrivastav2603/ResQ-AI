@@ -76,7 +76,7 @@ function DisasterNewsCard() {
         {!loading &&
           !error &&
           items.map((event) => (
-            
+            <a
               key={event.id}
               href={event.url || "#"}
               target="_blank"
