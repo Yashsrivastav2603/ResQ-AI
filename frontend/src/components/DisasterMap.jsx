@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MapContainer,
   TileLayer,
@@ -82,6 +83,26 @@ function getMarkerColor(severity) {
 function DisasterMap() {
   const [selectedIncident, setSelectedIncident] = useState(null);
 
+  <button
+  onClick={() =>
+    navigate("/resource-allocation", {
+      state: {
+        incident: {
+          id: incident.id,
+          type: incident.type,
+          severity: incident.severity,
+          location: `${incident.city}, ${incident.state}`,
+          affected: incident.affected,
+          needs: incident.needs,
+        },
+      },
+    })
+  }
+  className="mt-3 w-full rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-white"
+>
+  Review Allocation →
+</button>
+
   return (
     <div className="relative h-full min-h-105 w-full overflow-hidden rounded-2xl border border-white/10">
 
@@ -149,6 +170,15 @@ function DisasterMap() {
                     {incident.needs.join(" + ")}
                   </p>
 
+                  <button
+  onClick={() => {
+    window.location.href = "/resource-allocation";
+  }}
+  className="mt-3 w-full rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-white"
+>
+  Review Allocation →
+</button>
+
                 </div>
 
               </div>
@@ -159,6 +189,106 @@ function DisasterMap() {
         ))}
 
       </MapContainer>
+
+      {selectedIncident && (
+  <div className="absolute bottom-4 right-4 z-[1000] w-[300px] rounded-2xl border border-cyan-400/20 bg-[#07101d]/95 p-5 shadow-2xl backdrop-blur-md">
+
+    <div className="flex items-start justify-between gap-3">
+
+      <div>
+        <p className="text-[10px] font-semibold tracking-widest text-cyan-400">
+          SELECTED INCIDENT
+        </p>
+
+        <h3 className="mt-1 text-xl font-bold text-white">
+          {selectedIncident.type}
+        </h3>
+      </div>
+
+      <button
+        onClick={() => setSelectedIncident(null)}
+        className="text-slate-500 transition hover:text-white"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <p className="mt-2 text-sm text-slate-400">
+      📍 {selectedIncident.city}, {selectedIncident.state}
+    </p>
+
+    <div className="mt-4 grid grid-cols-2 gap-3">
+
+      <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+        <p className="text-[10px] text-slate-500">
+          SEVERITY
+        </p>
+
+        <p
+          className={`mt-1 font-bold ${
+            selectedIncident.severity === "Critical"
+              ? "text-red-400"
+              : selectedIncident.severity === "High"
+              ? "text-yellow-400"
+              : "text-emerald-400"
+          }`}
+        >
+          {selectedIncident.severity}
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+        <p className="text-[10px] text-slate-500">
+          AFFECTED
+        </p>
+
+        <p className="mt-1 font-bold text-white">
+          {selectedIncident.affected}
+        </p>
+      </div>
+
+    </div>
+
+    <div className="mt-4">
+      <p className="text-[10px] text-slate-500">
+        REQUIRED RESOURCES
+      </p>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {selectedIncident.needs.map((need) => (
+          <span
+            key={need}
+            className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs text-cyan-300"
+          >
+            {need}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <button
+      onClick={() =>
+        navigate("/resource-allocation", {
+          state: {
+            incident: {
+              id: selectedIncident.id,
+              type: selectedIncident.type,
+              severity: selectedIncident.severity,
+              location: `${selectedIncident.city}, ${selectedIncident.state}`,
+              affected: selectedIncident.affected,
+              needs: selectedIncident.needs,
+            },
+          },
+        })
+      }
+      className="mt-5 w-full rounded-xl bg-cyan-400 px-4 py-3 text-sm font-bold text-[#031018] transition hover:bg-cyan-300"
+    >
+      Review Allocation →
+    </button>
+
+  </div>
+)}
 
 
       {/* MAP HEADER */}
