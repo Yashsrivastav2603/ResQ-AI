@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { saveIncident } from "../services/demoStore";
+
+
 
 const ReportEmergency = () => {
   const navigate = useNavigate();
@@ -265,9 +268,82 @@ const ReportEmergency = () => {
     }, 1500);
   };
 
-  const handleSendToAuthority = () => {
-    navigate("/authority-dashboard");
-  };
+  
+const handleSendToAuthority = () => {
+  if (!analysis) {
+    alert("Please analyze the emergency first.");
+    return;
+  }
+
+  const affectedText = analysis.affected_people || "Unknown";
+
+  const affectedNumber =
+    Number(
+      String(affectedText)
+        .replace("+", "")
+        .replace("50+", "50")
+        .split("–")[0]
+        .trim()
+    ) || 0;
+
+  const incident = saveIncident({
+    type: analysis.incident || "Other",
+
+    severity: analysis.severity || "Medium",
+
+    description:
+      description.trim() ||
+      "Emergency reported through citizen emergency form.",
+
+    location: location
+      ? {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        }
+      : null,
+
+    imageName: image?.name || null,
+
+    affectedPeople: affectedNumber,
+
+    affectedEstimate: affectedText,
+
+    needs: Array.isArray(analysis.needs)
+      ? analysis.needs
+      : [],
+
+    source: "Citizen Report",
+
+    status: "Pending Verification",
+
+    aiAnalysis: {
+      incident: analysis.incident,
+      severity: analysis.severity,
+      affectedPeople: affectedText,
+      needs: analysis.needs,
+      confidence: analysis.confidence,
+    },
+
+    aiConfidence: analysis.confidence,
+
+    rescueRequests:
+      analysis.needs?.includes("Rescue") ? 1 : 0,
+
+    medicalEmergency:
+      analysis.needs?.includes("Medical"),
+
+    roadBlocked:
+      description.toLowerCase().includes("road") ||
+      description.toLowerCase().includes("rasta") ||
+      description.toLowerCase().includes("blocked"),
+  });
+
+  alert(
+    `Report submitted successfully!\n\nReport ID: ${incident.id}`
+  );
+
+  navigate("/authority-dashboard");
+};
 
   const getSeverityStyle = (severity) => {
     if (severity === "Critical") {

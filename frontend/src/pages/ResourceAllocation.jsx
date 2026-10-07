@@ -1,18 +1,31 @@
 import React, { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { updateIncident } from "../services/demoStore";
 
 const ResourceAllocation = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const incident = location.state?.incident || {
-    id: "RQ-001",
-    type: "Flood",
-    severity: "Critical",
-    affected: "50+",
-    location: "Guwahati, Assam",
-    needs: ["Rescue", "Medical"],
-  };
+  id: "RQ-001",
+  type: "Flood",
+  severity: "Critical",
+  affectedPeople: "50+",
+  location: "Guwahati, Assam",
+  needs: ["Rescue", "Medical"],
+};
+
+const incidentLocation =
+  typeof incident.location === "object"
+    ? incident.location?.address ||
+      (incident.location?.latitude != null &&
+      incident.location?.longitude != null
+        ? `${incident.location.latitude}, ${incident.location.longitude}`
+        : "Location unavailable")
+    : incident.location || "Location unavailable";
+
+const affectedPeople =
+  incident.affectedPeople ?? incident.affected ?? "Not estimated";
 
   const [allocation, setAllocation] = useState({
     ambulances: 2,
@@ -20,7 +33,9 @@ const ResourceAllocation = () => {
     medicalUnits: 1,
   });
 
-  const [deploymentStatus, setDeploymentStatus] = useState("Pending");
+  const [deploymentStatus, setDeploymentStatus] = useState(
+  incident.status || "Pending"
+);
 
   const steps = [
     "Pending",
@@ -31,25 +46,49 @@ const ResourceAllocation = () => {
   ];
 
   const currentStep = steps.indexOf(deploymentStatus);
+const handleApprove = () => {
+  const nextStatus = "Approved";
 
-  const handleApprove = () => {
-    setDeploymentStatus("Approved");
-  };
+  setDeploymentStatus(nextStatus);
 
-  const handleNextStage = () => {
-    const nextStep = currentStep + 1;
+  updateIncident(incident.id, {
+    status: nextStatus,
+    allocation,
+  });
+};
 
-    if (nextStep < steps.length) {
-      setDeploymentStatus(steps[nextStep]);
-    }
-  };
+const handleNextStage = () => {
+  const nextStep = currentStep + 1;
 
-  const handleModify = () => {
-    setAllocation((previous) => ({
+  if (nextStep < steps.length) {
+    const nextStatus = steps[nextStep];
+
+    setDeploymentStatus(nextStatus);
+
+    updateIncident(incident.id, {
+      status: nextStatus,
+      allocation,
+    });
+  }
+};
+
+const updateResource = (resource, change) => {
+  setAllocation((previous) => {
+    const updated = {
       ...previous,
-      ambulances: previous.ambulances === 2 ? 1 : 2,
-    }));
-  };
+      [resource]: Math.max(
+        0,
+        previous[resource] + change
+      ),
+    };
+
+    updateIncident(incident.id, {
+      allocation: updated,
+    });
+
+    return updated;
+  });
+};
 
   const priorityScore = useMemo(() => {
     if (incident.severity === "Critical") {
@@ -174,7 +213,7 @@ const ResourceAllocation = () => {
               </div>
 
               <h2 className="mt-3 text-2xl font-bold">
-                {incident.location}
+                {incidentLocation}
               </h2>
 
               <p className="mt-1 text-sm text-slate-400">
@@ -185,7 +224,7 @@ const ResourceAllocation = () => {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="rounded-xl bg-white/5 px-5 py-4">
                 <p className="text-xs text-slate-500">Affected</p>
-                <p className="mt-1 text-lg font-bold">{incident.affected}</p>
+                <p className="mt-1 text-lg font-bold">{affectedPeople}</p>
               </div>
 
               <div className="rounded-xl bg-white/5 px-5 py-4">
@@ -286,6 +325,26 @@ const ResourceAllocation = () => {
                   <p className="mt-1 text-xs text-emerald-300">
                     Available
                   </p>
+                  <div className="mt-4 flex items-center gap-3">
+  <button
+    onClick={() => updateResource("ambulances", -1)}
+    disabled={allocation.ambulances === 0}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10 disabled:opacity-40"
+  >
+    −
+  </button>
+
+  <span className="min-w-8 text-center font-bold">
+    {allocation.ambulances}
+  </span>
+
+  <button
+    onClick={() => updateResource("ambulances", 1)}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10"
+  >
+    +
+  </button>
+</div>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-[#081321] p-5">
@@ -299,6 +358,59 @@ const ResourceAllocation = () => {
                   <p className="mt-1 text-xs text-emerald-300">
                     Available
                   </p>
+                  <div className="mt-4 flex items-center gap-3">
+  <button
+    onClick={() => updateResource("rescueTeams", -1)}
+    disabled={allocation.rescueTeams === 0}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10 disabled:opacity-40"
+  >
+    −
+  </button>
+
+  <span className="min-w-8 text-center font-bold">
+    {allocation.rescueTeams}
+  </span>
+
+  <button
+    onClick={() => updateResource("rescueTeams", 1)}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10"
+  >
+    +
+  </button>
+</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-[#081321] p-5">
+                  <p className="text-3xl">⚕</p>
+                  <p className="mt-4 text-sm text-slate-400">
+                    Medical Units
+                  </p>
+                  <p className="mt-1 text-3xl font-bold">
+                    {allocation.medicalUnits}
+                  </p>
+                  <p className="mt-1 text-xs text-emerald-300">
+                    Available
+                  </p>
+                  <div className="mt-4 flex items-center gap-3">
+  <button
+    onClick={() => updateResource("medicalUnits", -1)}
+    disabled={allocation.medicalUnits === 0}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10 disabled:opacity-40"
+  >
+    −
+  </button>
+
+  <span className="min-w-8 text-center font-bold">
+    {allocation.medicalUnits}
+  </span>
+
+  <button
+    onClick={() => updateResource("medicalUnits", 1)}
+    className="rounded-lg border border-white/10 px-4 py-2 hover:bg-white/10"
+  >
+    +
+  </button>
+</div>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-[#081321] p-5">
