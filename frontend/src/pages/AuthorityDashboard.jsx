@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import DisasterMap from "../components/DisasterMap";
 import {
@@ -10,22 +10,57 @@ import {
 function AuthorityDashboard() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidents, setIncidents] = useState([]);
+  const selectedIncidentRef = useRef(null);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
+useEffect(() => {
+  const loadIncidents = () => {
     setIncidents(getIncidents());
-  }, []);
-
-  const handleStatusChange = (id, status) => {
-    const updated = updateIncidentStatus(id, status);
-    setIncidents(updated);
-
-    setSelectedIncident((previous) => {
-      if (!previous || previous.id !== id) return previous;
-      return { ...previous, status };
-    });
   };
+
+  loadIncidents();
+
+  const handleStorageChange = () => {
+    loadIncidents();
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+
+  return () => {
+    window.removeEventListener(
+      "storage",
+      handleStorageChange
+    );
+  };
+}, []);
+
+ const handleStatusChange = (id, status) => {
+  const updated = updateIncidentStatus(id, status);
+
+  setIncidents(updated);
+
+  setSelectedIncident((previous) => {
+    if (!previous || previous.id !== id) return previous;
+
+    return {
+      ...previous,
+      status,
+      updatedAt: new Date().toISOString(),
+    };
+  });
+
+  return updated;
+};
+useEffect(() => {
+  if (selectedIncident && selectedIncidentRef.current) {
+    setTimeout(() => {
+      selectedIncidentRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  }
+}, [selectedIncident]);
 
   const getLocationText = (location) => {
     if (!location) return "Location unavailable";
@@ -85,6 +120,60 @@ function AuthorityDashboard() {
 
     return total + (Number.isFinite(count) ? count : 0);
   }, 0);
+
+  // AI + Field Verification based resource recommendation
+const verifiedAffectedPopulation =
+  selectedIncident?.affectedEstimate
+    ? parseInt(
+        String(selectedIncident.affectedEstimate).replace(/\D/g, ""),
+        10
+      )
+    : 0;
+
+const rescueRequestCount =
+  selectedIncident?.rescueRequests ||
+  (selectedIncident?.needs?.some((need) =>
+    need.toLowerCase().includes("rescue")
+  )
+    ? 10
+    : 0);
+
+const medicalCaseCount =
+  selectedIncident?.medicalEmergency
+    ? 5
+    : selectedIncident?.needs?.some((need) =>
+        need.toLowerCase().includes("medical")
+      )
+      ? 3
+      : 0;
+
+const recommendedAmbulances =
+  selectedIncident?.severity === "Critical"
+    ? Math.max(2, Math.ceil(medicalCaseCount / 3))
+    : selectedIncident?.severity === "High"
+      ? 1
+      : 0;
+
+const recommendedRescueTeams =
+  rescueRequestCount >= 20
+    ? 3
+    : rescueRequestCount >= 10
+      ? 2
+      : rescueRequestCount > 0
+        ? 1
+        : 0;
+
+const recommendedMedicalUnits =
+  medicalCaseCount >= 5
+    ? 2
+    : medicalCaseCount > 0
+      ? 1
+      : 0;
+
+const estimatedPopulation =
+  verifiedAffectedPopulation > 0
+    ? verifiedAffectedPopulation
+    : selectedIncident?.affectedPeople || 0;
 
   return (
     <div className="min-h-screen bg-[#050b14] text-white">
@@ -197,6 +286,334 @@ function AuthorityDashboard() {
           </div>
         </div>
 
+        <section className="mt-8 rounded-3xl border border-orange-400/20 bg-orange-400/5 p-6">
+
+  <div className="flex items-start gap-4">
+
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-400/10 text-2xl">
+      ⚠️
+    </div>
+
+    <div>
+      <p className="text-xs font-bold tracking-[0.2em] text-orange-300">
+        FIELD VERIFICATION ALERT
+      </p>
+
+      <h3 className="mt-2 text-2xl font-black">
+        Potentially Unreported Area
+      </h3>
+
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+        No direct citizen report has been received from this
+        area, but disaster indicators suggest that field
+        verification may be required.
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-5 grid gap-3 sm:grid-cols-4">
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        VILLAGE
+      </p>
+      <p className="mt-1 font-bold">
+        Rampur
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        BASELINE POPULATION
+      </p>
+      <p className="mt-1 font-bold">
+        500
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        CONNECTIVITY
+      </p>
+      <p className="mt-1 font-bold text-orange-300">
+        Poor
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        REGIONAL HAZARD
+      </p>
+      <p className="mt-1 font-bold">
+        Flood
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+
+    <p className="text-xs font-semibold tracking-widest text-slate-500">
+      FIELD VERIFICATION
+    </p>
+
+    <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+
+      <p>• Survey affected households</p>
+      <p>• Estimate affected population</p>
+      <p>• Identify rescue requests</p>
+      <p>• Check medical emergencies</p>
+
+    </div>
+
+  </div>
+
+  <button
+    type="button"
+    onClick={() =>
+      alert(
+        "Field verification task created for Rampur."
+      )
+    }
+    className="mt-5 rounded-xl bg-orange-400 px-5 py-3 font-bold text-black transition hover:bg-orange-300"
+  >
+    Create Field Verification →
+  </button>
+
+</section>
+
+{/* FIELD VERIFICATION SNAPSHOT */}
+<section className="mt-8 rounded-3xl border border-cyan-400/20 bg-cyan-400/5 p-6">
+  <div className="flex items-start justify-between gap-4">
+    <div>
+      <p className="text-xs font-bold tracking-[0.2em] text-cyan-300">
+        FIELD VERIFICATION SNAPSHOT
+      </p>
+
+      <h3 className="mt-2 text-2xl font-black">
+        Rampur Ground Verification
+      </h3>
+
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+        Field volunteers can verify the actual situation when direct
+        citizen reports are unavailable or incomplete.
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-cyan-400/10 px-3 py-2 text-xs font-bold text-cyan-300">
+      DEMO DATA
+    </div>
+  </div>
+
+  {/* Population overview */}
+  <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-xs text-slate-500">
+        BASELINE POPULATION
+      </p>
+
+      <p className="mt-2 text-2xl font-black">
+        500
+      </p>
+
+      <p className="mt-1 text-xs text-slate-500">
+        Village population
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-xs text-slate-500">
+        HOUSEHOLDS VERIFIED
+      </p>
+
+      <p className="mt-2 text-2xl font-black">
+        52
+      </p>
+
+      <p className="mt-1 text-xs text-slate-500">
+        Ground survey completed
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-xs text-slate-500">
+        AFFECTED HOUSEHOLDS
+      </p>
+
+      <p className="mt-2 text-2xl font-black">
+        86
+      </p>
+
+      <p className="mt-1 text-xs text-slate-500">
+        Estimated from field inputs
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-xs text-slate-500">
+        AFFECTED POPULATION
+      </p>
+
+      <p className="mt-2 text-2xl font-black text-cyan-300">
+        300–380
+      </p>
+
+      <p className="mt-1 text-xs text-slate-500">
+        Estimated range
+      </p>
+    </div>
+
+  </div>
+
+  {/* Verification status */}
+  <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-bold">
+          Verification Progress
+        </p>
+
+        <p className="mt-1 text-xs text-slate-500">
+          52 of 86 affected households verified
+        </p>
+      </div>
+
+      <span className="rounded-full bg-green-400/10 px-3 py-1 text-xs font-bold text-green-300">
+        60% VERIFIED
+      </span>
+    </div>
+
+    <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
+      <div
+        className="h-full rounded-full bg-cyan-400"
+        style={{ width: "60%" }}
+      />
+    </div>
+
+    <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+
+      <div className="rounded-xl bg-green-400/5 p-3">
+        <p className="text-xs text-slate-500">
+          VERIFIED
+        </p>
+
+        <p className="mt-1 font-bold text-green-300">
+          52 households
+        </p>
+      </div>
+
+      <div className="rounded-xl bg-orange-400/5 p-3">
+        <p className="text-xs text-slate-500">
+          PENDING
+        </p>
+
+        <p className="mt-1 font-bold text-orange-300">
+          34 households
+        </p>
+      </div>
+
+      <div className="rounded-xl bg-white/5 p-3">
+        <p className="text-xs text-slate-500">
+          STATUS
+        </p>
+
+        <p className="mt-1 font-bold">
+          Ongoing
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  {/* Rescue & medical intelligence */}
+  <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+    <div className="rounded-2xl border border-red-400/20 bg-red-400/5 p-5">
+      <p className="text-xs font-bold tracking-widest text-red-300">
+        RESCUE REQUIREMENT
+      </p>
+
+      <p className="mt-2 text-3xl font-black">
+        27
+      </p>
+
+      <p className="mt-1 text-sm text-slate-400">
+        people requiring rescue assistance
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-purple-400/20 bg-purple-400/5 p-5">
+      <p className="text-xs font-bold tracking-widest text-purple-300">
+        MEDICAL EMERGENCIES
+      </p>
+
+      <p className="mt-2 text-3xl font-black">
+        5
+      </p>
+
+      <p className="mt-1 text-sm text-slate-400">
+        medical cases reported by field volunteers
+      </p>
+    </div>
+
+  </div>
+
+  {/* Important distinction */}
+  <div className="mt-6 rounded-2xl border border-yellow-400/20 bg-yellow-400/5 p-5">
+
+    <p className="text-xs font-bold tracking-widest text-yellow-300">
+      DATA CONFIDENCE
+    </p>
+
+    <p className="mt-2 text-sm leading-6 text-slate-400">
+      Population figures are currently estimates based on field
+      verification and available regional data. They should not be
+      treated as an exact count of trapped people until verified by
+      rescue teams or authorities.
+    </p>
+
+  </div>
+
+  <div className="mt-6 flex flex-wrap gap-3">
+
+    <button
+      type="button"
+      onClick={() =>
+        alert(
+          "Field verification updated successfully.\n\n" +
+          "52 households verified.\n" +
+          "Estimated affected population: 300–380.\n" +
+          "27 rescue requests identified.\n" +
+          "5 medical emergencies identified."
+        )
+      }
+      className="rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300"
+    >
+      Update Verification
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        alert(
+          "Rescue priority created for Rampur.\n\n" +
+          "Priority: Critical\n" +
+          "Estimated affected population: 300–380\n" +
+          "Rescue requests: 27\n" +
+          "Medical emergencies: 5"
+        )
+      }
+      className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-bold text-white transition hover:bg-white/10"
+    >
+      Create Rescue Priority →
+    </button>
+
+  </div>
+</section>
+
         {/* MAP + INCIDENTS */}
         <div className="mt-8 grid gap-6 lg:grid-cols-3">
           {/* LIVE MAP */}
@@ -287,31 +704,32 @@ function AuthorityDashboard() {
 
         {/* SELECTED INCIDENT */}
         {selectedIncident && (
-          <section className="mt-6 rounded-3xl border border-cyan-400/20 bg-[#081421] p-6">
-            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-              <div>
-                <p className="text-xs tracking-widest text-cyan-400">
-                  SELECTED INCIDENT
-                </p>
+          <section 
+            ref={selectedIncidentRef}
+          className="mt-6 rounded-3xl border border-cyan-400/20 bg-[#081421] p-6">
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+  <p className="text-xs font-bold tracking-widest text-slate-500">
+    INCIDENT STATUS
+  </p>
 
-                <h3 className="mt-2 text-2xl font-black">
-                  {selectedIncident.type}
-                </h3>
+  <div className="mt-2 flex items-center gap-3">
+    <span
+      className={`h-3 w-3 rounded-full ${
+        selectedIncident.status === "Rescue Dispatched"
+          ? "bg-red-400"
+          : selectedIncident.status === "Resources Allocated"
+            ? "bg-green-400"
+            : selectedIncident.status === "Verified"
+              ? "bg-cyan-400"
+              : "bg-orange-400"
+      }`}
+    />
 
-                <p className="mt-1 text-sm text-slate-500">
-                  {selectedIncident.id} •{" "}
-                  {getLocationText(selectedIncident.location)}
-                </p>
-              </div>
-
-              <span
-                className={`w-fit rounded-full border px-4 py-2 text-sm font-bold ${getSeverityStyle(
-                  selectedIncident.severity
-                )}`}
-              >
-                {selectedIncident.severity || "Unknown"} PRIORITY
-              </span>
-            </div>
+    <span className="font-bold">
+      {selectedIncident.status || "Pending Verification"}
+    </span>
+  </div>
+</div>
 
             {/* INCIDENT DETAILS */}
             <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -352,6 +770,96 @@ function AuthorityDashboard() {
               </div>
             </div>
 
+            {/* AI INCIDENT INTELLIGENCE */}
+
+<div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-5">
+
+  <div className="flex items-center gap-3">
+
+    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10">
+      🧠
+    </div>
+
+    <div>
+      <p className="text-xs tracking-widest text-cyan-300">
+        AI INCIDENT INTELLIGENCE
+      </p>
+
+      <p className="text-sm text-slate-400">
+        Automated analysis from citizen report
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        INCIDENT
+      </p>
+
+      <p className="mt-1 font-bold">
+        {selectedIncident.aiAnalysis?.incident ||
+          selectedIncident.type ||
+          "Unknown"}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        SEVERITY
+      </p>
+
+      <p className="mt-1 font-bold">
+        {selectedIncident.aiAnalysis?.severity ||
+          selectedIncident.severity ||
+          "Unknown"}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        AFFECTED
+      </p>
+
+      <p className="mt-1 font-bold">
+        {selectedIncident.affectedEstimate ||
+          selectedIncident.affectedPeople ||
+          "Unknown"}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        AI CONFIDENCE
+      </p>
+
+      <p className="mt-1 font-bold text-cyan-300">
+        {selectedIncident.aiConfidence
+          ? `${selectedIncident.aiConfidence}%`
+          : "N/A"}
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-4 rounded-xl border border-yellow-400/10 bg-yellow-400/5 p-4">
+
+    <p className="text-xs font-semibold text-yellow-300">
+      ⚠️ Verification Required
+    </p>
+
+    <p className="mt-1 text-xs leading-5 text-slate-400">
+      AI analysis supports emergency response decisions.
+      Final verification and resource deployment remain
+      under authorized human responders.
+    </p>
+
+  </div>
+
+</div>
+
             {/* AI RECOMMENDATION */}
             <div className="mt-5 rounded-2xl border border-purple-400/20 bg-purple-400/5 p-5">
               <div className="flex items-center gap-3">
@@ -369,36 +877,308 @@ function AuthorityDashboard() {
                 </div>
               </div>
 
+              <div className="mb-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+  <p className="text-xs font-bold tracking-[0.2em] text-cyan-300">
+    RESOURCE ALLOCATION INPUTS
+  </p>
+
+  <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+
+    <div>
+      <p className="text-xs text-slate-500">
+        AFFECTED POPULATION
+      </p>
+      <p className="mt-1 font-bold">
+        {estimatedPopulation || "Unknown"}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-xs text-slate-500">
+        RESCUE REQUESTS
+      </p>
+      <p className="mt-1 font-bold">
+        {rescueRequestCount || 0}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-xs text-slate-500">
+        MEDICAL CASES
+      </p>
+      <p className="mt-1 font-bold">
+        {medicalCaseCount || 0}
+      </p>
+    </div>
+
+  </div>
+
+  <p className="mt-4 text-xs leading-5 text-slate-500">
+    Recommendations are generated from incident severity,
+    reported needs and field-verification inputs. Final
+    allocation remains under authority control.
+  </p>
+</div>
+
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-xl bg-white/5 p-4">
                   <p className="text-xs text-slate-500">🚑 AMBULANCE</p>
-                  <p className="mt-1 text-xl font-black">2</p>
+                  <p className="mt-1 text-xl font-black">
+                    {recommendedAmbulances}
+                  </p>
                 </div>
 
                 <div className="rounded-xl bg-white/5 p-4">
                   <p className="text-xs text-slate-500">🚒 RESCUE TEAM</p>
-                  <p className="mt-1 text-xl font-black">1</p>
+                  <p className="mt-1 text-xl font-black">
+                    {recommendedRescueTeams}
+                  </p>
                 </div>
 
                 <div className="rounded-xl bg-white/5 p-4">
                   <p className="text-xs text-slate-500">🏥 MEDICAL UNIT</p>
-                  <p className="mt-1 text-xl font-black">1</p>
+                  <p className="mt-1 text-xl font-black">
+                    {recommendedMedicalUnits}
+                  </p>
                 </div>
               </div>
+
+              <div className="mt-6 rounded-2xl border border-green-400/20 bg-green-400/5 p-5">
+
+  <div className="flex items-start gap-3">
+
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-400/10 text-lg">
+      ✓
+    </div>
+
+    <div>
+      <p className="text-xs font-bold tracking-[0.2em] text-green-300">
+        ALLOCATION DECISION SUPPORT
+      </p>
+
+      <h4 className="mt-1 text-lg font-bold">
+        Recommended deployment
+      </h4>
+    </div>
+
+  </div>
+
+  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        RESCUE
+      </p>
+
+      <p className="mt-1 font-bold">
+        {recommendedRescueTeams} team
+        {recommendedRescueTeams !== 1 ? "s" : ""}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        AMBULANCE
+      </p>
+
+      <p className="mt-1 font-bold">
+        {recommendedAmbulances}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-white/5 p-4">
+      <p className="text-xs text-slate-500">
+        MEDICAL
+      </p>
+
+      <p className="mt-1 font-bold">
+        {recommendedMedicalUnits} unit
+        {recommendedMedicalUnits !== 1 ? "s" : ""}
+      </p>
+    </div>
+
+  </div>
+
+        <button
+        type="button"
+        onClick={() => {
+          if (!selectedIncident) return;
+
+          handleStatusChange(
+            selectedIncident.id,
+            "Resources Allocated"
+          );
+
+          alert(
+            "Resource allocation approved successfully.\n\n" +
+            `Rescue Teams: ${recommendedRescueTeams}\n` +
+            `Ambulances: ${recommendedAmbulances}\n` +
+            `Medical Units: ${recommendedMedicalUnits}\n\n` +
+            "Rescue mission is now ready for deployment."
+          );
+        }}
+        disabled={
+          !selectedIncident ||
+          selectedIncident.status === "Resources Allocated" ||
+          selectedIncident.status === "Rescue Dispatched"
+        }
+        className="mt-5 rounded-xl bg-green-400 px-5 py-3 font-bold text-black transition hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {selectedIncident?.status === "Resources Allocated"
+          ? "✓ Resources Allocated"
+          : "Approve Recommended Allocation →"}
+      </button>
+
+      {selectedIncident?.status === "Resources Allocated" && (
+  <div className="mt-6 rounded-2xl border border-green-400/20 bg-green-400/5 p-5">
+
+    <div className="flex items-start gap-3">
+
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-400/10 text-lg">
+        🚑
+      </div>
+
+      <div>
+        <p className="text-xs font-bold tracking-[0.2em] text-green-300">
+          RESOURCE ALLOCATION CONFIRMED
+        </p>
+
+        <h4 className="mt-1 text-lg font-bold">
+          Rescue mission ready for deployment
+        </h4>
+
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          Authority has approved the AI-assisted resource
+          recommendation. Rescue teams and emergency medical
+          resources can now be dispatched.
+        </p>
+      </div>
+
+    </div>
+
+    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+
+      <div className="rounded-xl bg-white/5 p-4">
+        <p className="text-xs text-slate-500">
+          RESCUE TEAMS
+        </p>
+
+        <p className="mt-1 text-xl font-black">
+          {recommendedRescueTeams}
+        </p>
+      </div>
+
+      <div className="rounded-xl bg-white/5 p-4">
+        <p className="text-xs text-slate-500">
+          AMBULANCES
+        </p>
+
+        <p className="mt-1 text-xl font-black">
+          {recommendedAmbulances}
+        </p>
+      </div>
+
+      <div className="rounded-xl bg-white/5 p-4">
+        <p className="text-xs text-slate-500">
+          MEDICAL UNITS
+        </p>
+
+        <p className="mt-1 text-xl font-black">
+          {recommendedMedicalUnits}
+        </p>
+      </div>
+
+    </div>
+
+        <button
+      type="button"
+      onClick={() => {
+        if (!selectedIncident) return;
+
+        handleStatusChange(
+          selectedIncident.id,
+          "Rescue Dispatched"
+        );
+
+          navigate("/rescue-tracking", {
+  state: {
+    incident: {
+      ...selectedIncident,
+      status: "Rescue Dispatched",
+    },
+    rescueTeams: recommendedRescueTeams,
+    ambulances: recommendedAmbulances,
+    medicalUnits: recommendedMedicalUnits,
+  },
+});        
+
+        alert(
+          "Rescue mission dispatched successfully.\n\n" +
+          `Rescue Teams: ${recommendedRescueTeams}\n` +
+          `Ambulances: ${recommendedAmbulances}\n` +
+          `Medical Units: ${recommendedMedicalUnits}\n\n` +
+          "Teams have been assigned to the incident."
+        );
+      }}
+      disabled={
+        !selectedIncident ||
+        selectedIncident.status === "Rescue Dispatched"
+      }
+      className="mt-5 rounded-xl bg-red-400 px-5 py-3 font-bold text-black transition hover:bg-red-300 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {selectedIncident?.status === "Rescue Dispatched"
+        ? "✓ Rescue Dispatched"
+        : "Dispatch Rescue Mission →"}
+    </button>
+
+  </div>
+)}
+
+  </div>
+
 
               {/* WHY */}
-              <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs font-semibold tracking-widest text-slate-500">
-                  WHY THIS RECOMMENDATION?
-                </p>
+             <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
 
-                <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
-                  <p>✓ Incident severity</p>
-                  <p>✓ Estimated affected population</p>
-                  <p>✓ Reported resource requirements</p>
-                  <p>✓ Available response resources</p>
-                </div>
-              </div>
+  <p>
+    ✓ {selectedIncident.severity || "Unknown"} severity incident
+  </p>
+
+  <p>
+    ✓ {selectedIncident.affectedEstimate ||
+      selectedIncident.affectedPeople ||
+      "Unknown"} people potentially affected
+  </p>
+
+  {selectedIncident.needs?.map((need, index) => (
+    <p key={index}>
+      ✓ {need} requested
+    </p>
+  ))}
+
+  {selectedIncident.roadBlocked && (
+    <p>
+      ✓ Road access may be blocked
+    </p>
+  )}
+
+</div>
+{selectedIncident?.affectedEstimate && (
+  <div className="mt-4 rounded-xl border border-cyan-400/10 bg-cyan-400/5 p-3">
+    <p className="text-xs font-bold tracking-widest text-cyan-300">
+      FIELD VERIFICATION INPUT
+    </p>
+
+    <p className="mt-2 text-sm text-slate-400">
+      Field verification indicates approximately{" "}
+      <span className="font-bold text-white">
+        {selectedIncident.affectedEstimate}
+      </span>{" "}
+      people may be affected. This estimate is used to
+      prioritize resource deployment.
+    </p>
+  </div>
+)}
 
               <p className="mt-4 text-sm leading-6 text-slate-400">
                 The recommendation supports authorized responders by
@@ -548,15 +1328,28 @@ function AuthorityDashboard() {
                   )}
 
                   <div className="mt-5 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleStatusChange(item.id, "Verified")}
-                      disabled={item.status === "Verified"}
-                      className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white disabled:opacity-50"
-                    >
-                      Verify Report
-                    </button>
+                        <button
+          type="button"
+          onClick={() => {
+            const updated = handleStatusChange(item.id, "Verified");
 
+            const verifiedIncident = updated.find(
+              (incident) => incident.id === item.id
+            );
+
+            if (verifiedIncident) {
+              setSelectedIncident(verifiedIncident);
+            }
+
+            alert(
+              `Incident ${item.id} verified successfully.\n\n` +
+              "Resource allocation can now proceed."
+            );
+          }}
+          className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white"
+        >
+          {item.status === "Verified" ? "✓ Verified" : "Verify Report"}
+        </button>
                     <button
                       type="button"
                       onClick={() =>

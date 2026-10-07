@@ -48,6 +48,8 @@ export function updateIncidentStatus(id, status) {
     STORAGE_KEY,
     JSON.stringify(updatedIncidents)
   );
+
+  return updatedIncidents;
 }
 export function updateIncident(id, updates) {
   const incidents = getIncidents();
