@@ -1,0 +1,7 @@
+target/
+*.jar
+*.log
+.env
+.idea/
+*.iml
+.vscode/

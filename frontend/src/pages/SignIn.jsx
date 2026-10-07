@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../services/coreApi";
 
 function SignIn() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/basic-details");
+    setSubmitting(true);
+    try {
+      await auth.login(email, password);
+      navigate("/home");
+    } catch (err) {
+      alert(err.message || "Sign in failed. Check your email and password.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -69,9 +79,10 @@ function SignIn() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-cyan-400 py-3.5 font-black text-black transition hover:bg-cyan-300"
+              disabled={submitting}
+              className="w-full rounded-xl bg-cyan-400 py-3.5 font-black text-black transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Sign In →
+              {submitting ? "Signing in..." : "Sign In →"}
             </button>
 
           </form>

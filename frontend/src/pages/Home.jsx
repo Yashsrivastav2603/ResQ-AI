@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DisasterMap from "../components/DisasterMap";
+import DisasterNewsCard from "../components/DisasterNewsCard";
 
 function Home() {
   const incidents = [
@@ -552,80 +553,10 @@ function Home() {
           </div>
 
         </section>
+                {/* ================= NEWS ================= */}
+        <DisasterNewsCard />
 
-        {/* ================= NEWS ================= */}
-        <section
-          id="news"
-          className="mt-8 rounded-3xl border border-white/10 bg-[#081421] p-6"
-        >
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-            <div>
-
-              <p className="text-xs font-semibold tracking-[0.2em] text-slate-500">
-                INFORMATION
-              </p>
-
-              <h2 className="mt-2 text-2xl font-bold">
-                Latest Disaster News
-              </h2>
-
-              <p className="mt-1 text-sm text-slate-500">
-                Important emergency and disaster situation updates.
-              </p>
-
-            </div>
-
-            <span className="w-fit rounded-full bg-cyan-400/10 px-3 py-1 text-xs text-cyan-300">
-              LIVE FEED
-            </span>
-
-          </div>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-
-            {news.map((item) => (
-
-              <div
-                key={item.title}
-                className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 transition hover:border-cyan-400/20 hover:bg-white/[0.05]"
-              >
-
-                <div className="flex gap-4">
-
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-xl">
-                    {item.icon}
-                  </div>
-
-                  <div>
-
-                    <h3 className="font-semibold">
-                      {item.title}
-                    </h3>
-
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      {item.text}
-                    </p>
-
-                    <p className="mt-3 text-[10px] text-slate-600">
-                      Recently updated
-                    </p>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </section>
-
-        {/* ================= QUICK ACTIONS ================= */}
-        <section className="mt-8">
+         <section className="mt-8">
 
           <div className="mb-5">
 
