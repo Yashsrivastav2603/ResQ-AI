@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+// import RescueTracking from "./pages/RescueTracking";
 import Verification from "../pages/Verification";
 import Landing from "../pages/Landing";
 import SignUp from "../pages/SignUp";
@@ -54,6 +54,10 @@ function App() {
           path="/resource-allocation"
           element={<ResourceAllocation />}
         />
+        {/* <Route
+  path="/rescue-tracking"
+  element={<RescueTracking />}
+/> */}
 
       </Routes>
     </BrowserRouter>
