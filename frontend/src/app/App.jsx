@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import RescueTracking from "./pages/RescueTracking";
+import RescueTracking from "../pages/RescueTracking";
 import Verification from "../pages/Verification";
 import Landing from "../pages/Landing";
 import SignUp from "../pages/SignUp";
@@ -13,10 +13,14 @@ import AuthorityDashboard from "../pages/AuthorityDashboard";
 import Incidents from "../pages/Incidents";
 import Resources from "../pages/Resources";
 import ResourceAllocation from "../pages/ResourceAllocation";
-
+import CriticalAlert from "../components/CriticalAlert";
+import SafeLocationMap from "../components/SafeLocationMap";
+import safeLocations from "../data/safeLocations";
 function App() {
   return (
     <BrowserRouter>
+     <CriticalAlert />
+
       <Routes>
 
         {/* First page */}
@@ -54,10 +58,10 @@ function App() {
           path="/resource-allocation"
           element={<ResourceAllocation />}
         />
-        {/* <Route
+      { <Route
   path="/rescue-tracking"
   element={<RescueTracking />}
-/> */}
+/> }
 
       </Routes>
     </BrowserRouter>

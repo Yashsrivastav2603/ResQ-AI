@@ -18,18 +18,38 @@ useEffect(() => {
     setIncidents(getIncidents());
   };
 
+  // Load incidents when dashboard opens
   loadIncidents();
 
+  // Handle updates from another browser tab
   const handleStorageChange = () => {
     loadIncidents();
   };
 
-  window.addEventListener("storage", handleStorageChange);
+  // Handle updates from the same browser tab
+  const handleIncidentUpdate = () => {
+    loadIncidents();
+  };
+
+  window.addEventListener(
+    "storage",
+    handleStorageChange
+  );
+
+  window.addEventListener(
+    "resqai-incidents-updated",
+    handleIncidentUpdate
+  );
 
   return () => {
     window.removeEventListener(
       "storage",
       handleStorageChange
+    );
+
+    window.removeEventListener(
+      "resqai-incidents-updated",
+      handleIncidentUpdate
     );
   };
 }, []);
@@ -352,7 +372,7 @@ const estimatedPopulation =
 
   </div>
 
-  <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+  <div className="mt-5 rounded-xl border border-white/10 bg-white/3 p-4">
 
     <p className="text-xs font-semibold tracking-widest text-slate-500">
       FIELD VERIFICATION
@@ -1016,17 +1036,20 @@ const estimatedPopulation =
             `Medical Units: ${recommendedMedicalUnits}\n\n` +
             "Rescue mission is now ready for deployment."
           );
-        }}
-        disabled={
+                }}
+              disabled={
           !selectedIncident ||
-          selectedIncident.status === "Resources Allocated" ||
-          selectedIncident.status === "Rescue Dispatched"
+          selectedIncident.status !== "Verified" &&
+          selectedIncident.status !== "Resources Allocated" &&
+          selectedIncident.status !== "Rescue Dispatched"
         }
         className="mt-5 rounded-xl bg-green-400 px-5 py-3 font-bold text-black transition hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {selectedIncident?.status === "Resources Allocated"
-          ? "✓ Resources Allocated"
-          : "Approve Recommended Allocation →"}
+  ? "✓ Resources Allocated"
+  : selectedIncident?.status !== "Verified"
+    ? "Verify Incident First"
+    : "Approve Recommended Allocation →"}
       </button>
 
       {selectedIncident?.status === "Resources Allocated" && (
@@ -1254,7 +1277,12 @@ const estimatedPopulation =
             </div>
           ) : (
             <div className="space-y-4">
-              {incidents.map((item) => (
+              {incidents
+  .filter(
+    (item) =>
+      item.status === "Pending Verification"
+  )
+  .map((item) => (
                 <article
                   key={item.id}
                   className="rounded-xl border border-slate-200 p-5"
@@ -1326,49 +1354,52 @@ const estimatedPopulation =
                       </div>
                     </div>
                   )}
+<div className="mt-5 flex flex-wrap gap-3">
 
-                  <div className="mt-5 flex flex-wrap gap-3">
-                        <button
-          type="button"
-          onClick={() => {
-            const updated = handleStatusChange(item.id, "Verified");
+  <button
+    type="button"
+    onClick={() => {
+      const updated = handleStatusChange(
+        item.id,
+        "Verified"
+      );
 
-            const verifiedIncident = updated.find(
-              (incident) => incident.id === item.id
-            );
+      const verifiedIncident = updated.find(
+        (incident) => incident.id === item.id
+      );
 
-            if (verifiedIncident) {
-              setSelectedIncident(verifiedIncident);
-            }
+      if (verifiedIncident) {
+        setSelectedIncident(verifiedIncident);
+      }
 
-            alert(
-              `Incident ${item.id} verified successfully.\n\n` +
-              "Resource allocation can now proceed."
-            );
-          }}
-          className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white"
-        >
-          {item.status === "Verified" ? "✓ Verified" : "Verify Report"}
-        </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleStatusChange(item.id, "Needs More Information")
-                      }
-                      className="rounded-lg border border-amber-400 px-4 py-2 font-semibold text-amber-700"
-                    >
-                      Request Information
-                    </button>
+      alert(
+        `Incident ${item.id} verified successfully.\n\n` +
+        "Resource allocation can now proceed."
+      );
+    }}
+    className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white"
+  >
+    {item.status === "Verified"
+      ? "✓ Verified"
+      : "Verify Report"}
+  </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleStatusChange(item.id, "Rejected")}
-                      disabled={item.status === "Rejected"}
-                      className="rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 disabled:opacity-50"
-                    >
-                      Reject
-                    </button>
-                  </div>
+
+  <button
+    type="button"
+    onClick={() =>
+      handleStatusChange(
+        item.id,
+        "Rejected"
+      )
+    }
+    disabled={item.status === "Rejected"}
+    className="rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 disabled:opacity-50"
+  >
+    Reject
+  </button>
+
+</div>
                 </article>
               ))}
             </div>

@@ -286,57 +286,39 @@ const handleSendToAuthority = () => {
         .trim()
     ) || 0;
 
-  const incident = saveIncident({
-    type: analysis.incident || "Other",
+const incident = saveIncident({
+  id: `RQ-${Date.now()}`,
 
-    severity: analysis.severity || "Medium",
+  type:
+    analysis.incident || "Emergency",
 
-    description:
-      description.trim() ||
-      "Emergency reported through citizen emergency form.",
+  title:
+    `${analysis.incident || "Emergency"} Report`,
 
-    location: location
-      ? {
-          latitude: location.latitude,
-          longitude: location.longitude,
-        }
-      : null,
+  description:
+    description,
 
-    imageName: image?.name || null,
+  severity:
+    analysis.severity || "Medium",
 
-    affectedPeople: affectedNumber,
+  affectedPeople:
+    affectedNumber,
 
-    affectedEstimate: affectedText,
+  needs:
+    analysis.needs || [],
 
-    needs: Array.isArray(analysis.needs)
-      ? analysis.needs
-      : [],
+  location: {
+    latitude: location?.latitude ?? null,
+    longitude: location?.longitude ?? null,
+    address: location?.address ?? "",
+  },
 
-    source: "Citizen Report",
+  status: "Pending Verification",
 
-    status: "Pending Verification",
+  createdAt: new Date().toISOString(),
 
-    aiAnalysis: {
-      incident: analysis.incident,
-      severity: analysis.severity,
-      affectedPeople: affectedText,
-      needs: analysis.needs,
-      confidence: analysis.confidence,
-    },
-
-    aiConfidence: analysis.confidence,
-
-    rescueRequests:
-      analysis.needs?.includes("Rescue") ? 1 : 0,
-
-    medicalEmergency:
-      analysis.needs?.includes("Medical"),
-
-    roadBlocked:
-      description.toLowerCase().includes("road") ||
-      description.toLowerCase().includes("rasta") ||
-      description.toLowerCase().includes("blocked"),
-  });
+  updatedAt: new Date().toISOString(),
+});
 
   alert(
     `Report submitted successfully!\n\nReport ID: ${incident.id}`
