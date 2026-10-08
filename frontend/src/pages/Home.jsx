@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DisasterMap from "../components/DisasterMap";
-
+import SafeLocationMap from "../components/SafeLocationMap";
 function Home() {
   const incidents = [
     {
@@ -50,6 +50,8 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-[#050b12] text-white">
+
+     
 
       {/* ================= NAVBAR ================= */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050b12]/90 backdrop-blur-xl">
@@ -340,6 +342,10 @@ function Home() {
           </div>
 
         </section>
+
+         <section className="mt-8">
+  <SafeLocationMap />
+</section>
 
         {/* ================= PRIORITY INCIDENTS ================= */}
         <section className="mt-8">

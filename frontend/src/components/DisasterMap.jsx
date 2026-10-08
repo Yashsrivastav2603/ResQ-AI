@@ -191,7 +191,7 @@ function DisasterMap() {
       </MapContainer>
 
       {selectedIncident && (
-  <div className="absolute bottom-4 right-4 z-[1000] w-[300px] rounded-2xl border border-cyan-400/20 bg-[#07101d]/95 p-5 shadow-2xl backdrop-blur-md">
+  <div className="absolute bottom-4 right-4 z-1000 w-75 rounded-2xl border border-cyan-400/20 bg-[#07101d]/95 p-5 shadow-2xl backdrop-blur-md">
 
     <div className="flex items-start justify-between gap-3">
 
