@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { mergeSignupDraft } from "../services/signupDraft";
 
 function BasicDetails() {
   const navigate = useNavigate();
@@ -21,6 +22,14 @@ function BasicDetails() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    mergeSignupDraft({
+      city: form.city,
+      state: form.state,
+      postalCode: form.postalCode,
+      country: "India",
+    });
+
     navigate("/verification");
   };
 
