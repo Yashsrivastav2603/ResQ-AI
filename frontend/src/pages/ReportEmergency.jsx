@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { saveIncident } from "../services/demoStore";
-
+import { reportIncidentToBackend } from "../services/backendIncidents";
 
 
 const ReportEmergency = () => {
@@ -269,82 +269,74 @@ const ReportEmergency = () => {
   };
 
   
-const handleSendToAuthority = () => {
-  if (!analysis) {
-    alert("Please analyze the emergency first.");
-    return;
-  }
+  const handleSendToAuthority = async () => {
+    if (!analysis) {
+      alert("Please analyze the emergency first.");
+      return;
+    }
 
-  const affectedText = analysis.affected_people || "Unknown";
+    const affectedText = analysis.affected_people || "Unknown";
 
-  const affectedNumber =
-    Number(
-      String(affectedText)
-        .replace("+", "")
-        .replace("50+", "50")
-        .split("–")[0]
-        .trim()
-    ) || 0;
+    const affectedNumber =
+      Number(
+        String(affectedText)
+          .replace("+", "")
+          .replace("50+", "50")
+          .split("–")[0]
+          .trim()
+      ) || 0;
 
-  const incident = saveIncident({
-    type: analysis.incident || "Other",
+    // 1) Keep Akash's existing flow exactly as it was
+    const incident = saveIncident({
+      type: analysis.incident || "Other",
+      severity: analysis.severity || "Medium",
+      description:
+        description.trim() ||
+        "Emergency reported through citizen emergency form.",
+      location: location
+        ? { latitude: location.latitude, longitude: location.longitude }
+        : null,
+      imageName: image?.name || null,
+      affectedPeople: affectedNumber,
+      affectedEstimate: affectedText,
+      needs: Array.isArray(analysis.needs) ? analysis.needs : [],
+      source: "Citizen Report",
+      status: "Pending Verification",
+      aiAnalysis: {
+        incident: analysis.incident,
+        severity: analysis.severity,
+        affectedPeople: affectedText,
+        needs: analysis.needs,
+        confidence: analysis.confidence,
+      },
+      aiConfidence: analysis.confidence,
+      rescueRequests: analysis.needs?.includes("Rescue") ? 1 : 0,
+      medicalEmergency: analysis.needs?.includes("Medical"),
+      roadBlocked:
+        description.toLowerCase().includes("road") ||
+        description.toLowerCase().includes("rasta") ||
+        description.toLowerCase().includes("blocked"),
+    });
 
-    severity: analysis.severity || "Medium",
+    // 2) Also send a copy to the real backend (never blocks the demo flow)
+    let syncNote = "";
+    try {
+      const saved = await reportIncidentToBackend({
+        analysis,
+        description,
+        location,
+        affectedNumber,
+      });
+      syncNote = `\nSaved to server (priority ${saved.priorityScore}/100)`;
+    } catch (error) {
+      console.error("Backend sync failed:", error);
+      syncNote = `\n(Server sync failed: ${error.message})`;
+    }
 
-    description:
-      description.trim() ||
-      "Emergency reported through citizen emergency form.",
+    alert(`Report submitted successfully!\n\nReport ID: ${incident.id}${syncNote}`);
 
-    location: location
-      ? {
-          latitude: location.latitude,
-          longitude: location.longitude,
-        }
-      : null,
-
-    imageName: image?.name || null,
-
-    affectedPeople: affectedNumber,
-
-    affectedEstimate: affectedText,
-
-    needs: Array.isArray(analysis.needs)
-      ? analysis.needs
-      : [],
-
-    source: "Citizen Report",
-
-    status: "Pending Verification",
-
-    aiAnalysis: {
-      incident: analysis.incident,
-      severity: analysis.severity,
-      affectedPeople: affectedText,
-      needs: analysis.needs,
-      confidence: analysis.confidence,
-    },
-
-    aiConfidence: analysis.confidence,
-
-    rescueRequests:
-      analysis.needs?.includes("Rescue") ? 1 : 0,
-
-    medicalEmergency:
-      analysis.needs?.includes("Medical"),
-
-    roadBlocked:
-      description.toLowerCase().includes("road") ||
-      description.toLowerCase().includes("rasta") ||
-      description.toLowerCase().includes("blocked"),
-  });
-
-  alert(
-    `Report submitted successfully!\n\nReport ID: ${incident.id}`
-  );
-
-  navigate("/authority-dashboard");
-};
-
+    navigate("/authority-dashboard");
+  };
   const getSeverityStyle = (severity) => {
     if (severity === "Critical") {
       return "border-red-400/30 bg-red-500/10 text-red-300";
