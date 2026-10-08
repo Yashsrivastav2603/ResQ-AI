@@ -1,4 +1,0 @@
-from fastapi import APIRouter
-router=APIRouter()
-@router.get("/resources")
-def get_resources(): return [{"id":"AMB-01","type":"Ambulance","status":"Available","lat":26.44,"lng":80.34},{"id":"AMB-02","type":"Ambulance","status":"Available","lat":26.45,"lng":80.33},{"id":"RES-01","type":"Rescue Team","status":"Available","lat":26.47,"lng":80.36}]
